@@ -12,7 +12,7 @@ BOOL APIENTRY DllMain(HMODULE /*hModule*/, DWORD reason, LPVOID /*lpReserved*/)
 		IMAGE_DOS_HEADER* dos = (IMAGE_DOS_HEADER*)(base);
 		IMAGE_NT_HEADERS* nt = (IMAGE_NT_HEADERS*)(base + dos->e_lfanew);
 
-		if ((base + nt->OptionalHeader.AddressOfEntryPoint + (0x400000 - base)) == 0x7C4040) // Check if .exe file is compatible - Thanks to thelink2012 and MWisBest
+		if (nt->OptionalHeader.AddressOfEntryPoint == 0x3C4040) // Check if .exe file is compatible - Thanks to thelink2012 and MWisBest
 		{
 			Init();
 		}
