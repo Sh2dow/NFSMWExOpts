@@ -1,16 +1,18 @@
+#pragma once
+
 #include "stdio.h"
 #include <windows.h>
 #include "..\includes\injector\injector.hpp"
 #include "..\includes\IniReader.h"
 
-void Thing()
+inline void Thing()
 {
 	_asm pushad;
 
 	raceOptions = *(DWORD*)_FEDatabase; // Race Options Pointer (Thanks to samfednik)
 	GameState = *(DWORD*)_TheGameFlowManager; // 3 = FE, 4&5 = Loading screen, 6 = Gameplay
 
-	if (!(*(bool*)_IsLostFocus))
+	if (!*(bool*)_IsLostFocus)
 	{
 		// Ultimate Force Heat Level
 		if ((GetAsyncKeyState(hotkeyToggleForceHeat) & 1) && (GameState == 6)) //When pressed "Toggle Force Heat"

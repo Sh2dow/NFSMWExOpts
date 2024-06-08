@@ -26,7 +26,7 @@ DWORD ButtonResult = 0;
 #include "CodeCaves.h"
 #include "HotkeyStuff.h"
 
-void Init()
+inline void Init()
 {
 	CIniReader iniReader("NFSMWExtraOptionsSettings.ini");
 
@@ -203,13 +203,13 @@ void Init()
 	PurchasedCarLimit--;
 
 	ImpoundStrikesCount %= 128;
-	if (!ImpoundStrikesCount) ImpoundStrikesCount = 3;
+	if (ImpoundStrikesCount == 0) ImpoundStrikesCount = 3;
 
 	MaxImpoundStrikesCount %= 128;
-	if (!MaxImpoundStrikesCount) MaxImpoundStrikesCount = 5;
+	if (MaxImpoundStrikesCount == 0) MaxImpoundStrikesCount = 5;
 
 	MaxUniqueOpponentCars %= 8;
-	if (!MaxUniqueOpponentCars) MaxUniqueOpponentCars = 3;
+	if (MaxUniqueOpponentCars == 0) MaxUniqueOpponentCars = 3;
 
 	CarbonStyleTirePop %= 3;
 
@@ -279,7 +279,6 @@ void Init()
 		// Remove Minimum Restriction
 		injector::MakeNOP(0x551460, 5, true);
 	}
-
 	else // Normal behaviour
 	{
 		injector::WriteMemory<unsigned char>(0x551461, maxBlacklist, true);
@@ -390,7 +389,8 @@ void Init()
 	if (HideOnline)
 		injector::WriteMemory<unsigned char>(0x5450f9, 0x46, true);
 
-	if (ShowOnlineOpts) injector::MakeNOP(0x5290B2, 2, true); // Show Online Options menu
+	if (ShowOnlineOpts) 
+		injector::MakeNOP(0x5290B2, 2, true); // Show Online Options menu
 
 	// Fix headlights force on
 	injector::WriteMemory<float>(0x742AB7, 0, true);
@@ -443,10 +443,12 @@ void Init()
 	{
 		injector::WriteMemory<unsigned char>(0x8F86FC, EnableMusic, true);
 	}
+
 	if (ShowMessage)
 	{
 		injector::MakeCALL(0x0058F710, DialogBoxReturnValue, true);
 	}
+
 	if (SkipCareerIntro)
 	{
 		injector::WriteMemory<unsigned char>(0x926125, 1, true); // SkipDDayRaces
@@ -601,12 +603,12 @@ void Init()
 	if (UG2SaveMoney < -29999) UG2SaveMoney = -29999; // prevents a potential softlock (you'll still need to edit the cost of a car though)
 	if (UG2SaveMoney < 0)
 	{
-		injector::WriteMemory<std::uint8_t>(0x0056D7CC + 1, 0x69, true); // sub instead of add
-		injector::WriteMemory<std::uint32_t>(0x0056D7CC + 3, abs(UG2SaveMoney), true); // positive value because uint
+		injector::WriteMemory<uint8_t>(0x0056D7CC + 1, 0x69, true); // sub instead of add
+		injector::WriteMemory<uint32_t>(0x0056D7CC + 3, abs(UG2SaveMoney), true); // positive value because uint
 	}
 	else
 	{
-		injector::WriteMemory<std::uint32_t>(0x0056D7CC + 3, UG2SaveMoney, true);
+		injector::WriteMemory<uint32_t>(0x0056D7CC + 3, UG2SaveMoney, true);
 	}
 
 	// Car size hack
@@ -797,6 +799,7 @@ void Init()
 			injector::WriteMemory<float>(0x6A9EDE, 0.15f, true);
 			injector::WriteMemory(0x6A9EEC, &PoppedTireTractionBoost, true);
 			break;
+
 		case 2: // 1:1 Mix of both games
 			injector::WriteMemory<float>(0x6A9ED2, 0.01f, true); // SuspensionRacer::TuneWheelParams
 			injector::WriteMemory<float>(0x6A9EDE, 0.575f, true);
@@ -812,7 +815,7 @@ void Init()
 		injector::WriteMemory<DWORD>(0x89BB44, 0x50F7A0, true); // change code location
 		injector::MakeRangedNOP(0x50F7AE, 0x50F7B6, true); // cleanup
 
-		char LoadToEcx[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00 }; // mov ecx,[009B392C]
+		unsigned char LoadToEcx[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00 }; // mov ecx,[009B392C]
 		injector::WriteMemoryRaw(0x50F7AE, LoadToEcx, sizeof(LoadToEcx), true);
 		injector::WriteMemory<unsigned char>(0x50F7BE, 0x08, true); // mov [ecx+8], edx
 
@@ -820,12 +823,12 @@ void Init()
 		// VOTimeOfDay::Draw(void)
 		injector::WriteMemory<DWORD>(0x89BB4C, 0x51B5E0, true);
 		injector::WriteMemory<DWORD>(0x51B5F5, 0x999D1383, true); // "Time of Day"
-		char LoadToEcx2[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00, 0x90, 0x90, 0x90, 0x8B, 0x49, 0x08 }; // mov ecx,[009B392C]; mov ecx,[ecx+08]
+		unsigned char LoadToEcx2[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00, 0x90, 0x90, 0x90, 0x8B, 0x49, 0x08 }; // mov ecx,[009B392C]; mov ecx,[ecx+08]
 		injector::WriteMemoryRaw(0x51B617, LoadToEcx2, sizeof(LoadToEcx2), true);
 
 
 		// VOTimeOfDay::SetInitialValues(void)
-		char LoadTimeOfDay[] = { 0x8B, 0x15, 0x2C, 0x39, 0x9B, 0x00, 0x8B, 0x52, 0x08 }; // mov edx,[009B392C]; mov edx,[edx+08]
+		unsigned char LoadTimeOfDay[] = { 0x8B, 0x15, 0x2C, 0x39, 0x9B, 0x00, 0x8B, 0x52, 0x08 }; // mov edx,[009B392C]; mov edx,[edx+08]
 		injector::WriteMemoryRaw(0x50F9E0, LoadTimeOfDay, sizeof(LoadTimeOfDay), true);
 
 		injector::MakeRangedNOP(0x50F9F5, 0x50F9F8, true); // nop fstp
