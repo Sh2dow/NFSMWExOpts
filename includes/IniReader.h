@@ -90,14 +90,9 @@ public:
         SetIniPath("");
     }
 
-    CIniReader(char* szFileName)
-    {
-        SetIniPath(szFileName);
-    }
-
     CIniReader(const char* szFileName)
     {
-        SetIniPath((char*)szFileName);
+        SetIniPath(szFileName);
     }
 
     CIniReader(std::stringstream& ini_mem)
@@ -160,7 +155,7 @@ public:
         SetIniPath("");
     }
 
-    void SetIniPath(char* szFileName)
+    void SetIniPath(const char* szFileName)
     {
         char buffer[MAX_PATH];
         HMODULE hm = NULL;
@@ -184,7 +179,7 @@ public:
         data.load_file(m_szFileName);
     }
 
-    int ReadInteger(char* szSection, char* szKey, int iDefaultValue)
+    int ReadInteger(const char* szSection, const char* szKey, int iDefaultValue)
     {
         try {
             auto str = data.get(szSection, szKey, std::to_string(iDefaultValue));
@@ -195,7 +190,7 @@ public:
         }
     }
 
-    float ReadFloat(char* szSection, char* szKey, float fltDefaultValue)
+    float ReadFloat(const char* szSection, const char* szKey, float fltDefaultValue)
     {
         try {
             return (float)atof(data.get(szSection, szKey, std::to_string(fltDefaultValue)).c_str());
@@ -205,7 +200,7 @@ public:
         }
     }
 
-    bool ReadBoolean(char* szSection, char* szKey, bool bolDefaultValue)
+    bool ReadBoolean(const char* szSection, const char* szKey, bool bolDefaultValue)
     {
         try {
             auto& config = data[szSection];
@@ -220,10 +215,11 @@ public:
         }
     }
 
-    char* ReadString(char* szSection, char* szKey, const char* szDefaultValue)
+    const char* ReadString(const char* szSection, const char* szKey, const char* szDefaultValue)
     {
         char* szResult = new char[255];
-        try {
+        try
+        {
             auto& config = data[szSection];
             if (config.count(szKey))
             {
@@ -242,14 +238,14 @@ public:
         return szResult;
     }
 
-    std::string ReadString(char* szSection, char* szKey, std::string szDefaultValue)
+    std::string ReadString(const char* szSection, const char* szKey, std::string szDefaultValue)
     {
-        char* str = ReadString(szSection, szKey, szDefaultValue.c_str());
+        const char* str = ReadString(szSection, szKey, szDefaultValue.c_str());
         std::string* szResult = new std::string(str);
         return *szResult;
     }
 
-    void WriteInteger(char* szSection, char* szKey, int iValue, bool useparser = false)
+    void WriteInteger(const char* szSection, const char* szKey, int iValue, bool useparser = false)
     {
         if (useparser)
         {
@@ -264,7 +260,7 @@ public:
         }
     }
 
-    void WriteFloat(char* szSection, char* szKey, float fltValue, bool useparser = false)
+    void WriteFloat(const char* szSection, const char* szKey, float fltValue, bool useparser = false)
     {
         if (useparser)
         {
@@ -279,7 +275,7 @@ public:
         }
     }
 
-    void WriteBoolean(char* szSection, char* szKey, bool bolValue, bool useparser = false)
+    void WriteBoolean(const char* szSection, const char* szKey, bool bolValue, bool useparser = false)
     {
         if (useparser)
         {
@@ -294,7 +290,7 @@ public:
         }
     }
 
-    void WriteString(char* szSection, char* szKey, char* szValue, bool useparser = false)
+    void WriteString(const char* szSection, const char* szKey, const char* szValue, bool useparser = false)
     {
         if (useparser)
         {

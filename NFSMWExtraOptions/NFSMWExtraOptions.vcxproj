@@ -65,8 +65,8 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Games\Need for Speed Most Wanted\scripts"  /y
-copy "$(TargetDir)*.pdb" "G:\Games\Need for Speed Most Wanted\scripts"  /y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -87,7 +87,8 @@ copy "$(TargetDir)*.pdb" "G:\Games\Need for Speed Most Wanted\scripts"  /y</Comm
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)*.asi" "G:\Games\Need for Speed Most Wanted\scripts"  /y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
