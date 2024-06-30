@@ -9,14 +9,18 @@
 #include "GlobalVariables.h"
 #include "InGameFunctions.h"
 
+using u8 = uint8_t;
+using u16 = uint16_t;
+using u32 = uint32_t;
+
 float heatLevel, gameSpeed, FallingRainSize, RainAmount, RoadReflection, RainIntensity, RainXing, RainFallSpeed, RainGravity, SplashScreenTimeLimit, CarSelectTireSteerAngle, MaxHeatLevel, MinHeatLevel, WorldAnimationSpeed, CarScale, VTRed, VTBlue, VTGreen, VTBlackBloom, VTColorBloom, VTSaturation, DebugCameraTurboSpeed, DebugCameraSuperTurboSpeed, SBRechargeTime, SBRechargeSpeedLimit, SBMassMultiplier, SpeedingLimit, ExcessiveSpeedingLimit, RecklessDrivingLimit;
 int hotkeyToggleForceHeat, hotkeyForceHeatLevel, hotkeyToggleCopLights, hotkeyToggleHeadlights, hotkeyCarHack, hotkeyUnlockAllThings, hotkeyAutoDrive, randomizeCount, hotkeyToggleCops, hotkeyFreezeCamera, NosTrailRepeatCount, UG2SaveMoney, ForceMaximumFSAALevel, ForceCarLOD, ForceTireLOD;
-unsigned char raceType, raceMode, minLaps, maxLaps, minOpponents, maxOpponents, maxLapsRandomQR, maxOpponentsRandomQR, maxBlacklist, csBlacklist, headlightsMode, lowTraffic, medTraffic, highTraffic, ShowHiddenTracks, MaxUniqueOpponentCars, ShowAllCarsInFE, SelectableMarkerCount, PurchasedCarLimit, CarbonStyleTirePop, ImpoundStrikesCount, MaxImpoundStrikesCount;
+u8 raceType, raceMode, minLaps, maxLaps, minOpponents, maxOpponents, maxLapsRandomQR, maxOpponentsRandomQR, maxBlacklist, csBlacklist, headlightsMode, lowTraffic, medTraffic, highTraffic, ShowHiddenTracks, MaxUniqueOpponentCars, ShowAllCarsInFE, SelectableMarkerCount, PurchasedCarLimit, CarbonStyleTirePop, ImpoundStrikesCount, MaxImpoundStrikesCount;
 bool copLightsEnabled, HideOnline, ShowOnlineOpts, removeSceneryGroupDoor, removePlayerBarriers, unfreezeKO, EnablePresetAndDebugCars, AlwaysRain, SkipMovies, EnableSound, EnableMusic, EnableCameras, ExOptsTeamTakeOver, ShowSubs, EnableHeatLevelOverride, CarbonStyleRaceProgress, moreVinyls, eatSomeBurgers, UnlockAllThings, GarageRotate, GarageZoom, GarageShowcase, EnableSaveLoadHotPos, EnableMaxPerfOnShop, EnableVTOverride, EnableDebugWorldCamera, DebugWorldCamera, DebugWatchCarCamera, ForceBlackEdition, HelicopterFix, X10Fix, WheelFix, ExperimentalSplitScreenFix, ShowDebugCarCustomize, CarbonStyleBustedScreen, ShowMessage, ReplayBlacklistRaces, PursuitActionMode, MoreCarsForOpponents, VisualFixesAndTweaks, UncensoredBustedScreen, ShowPursuitCops, ShowNonPursuitCops, ShowDebugEventID, CarbonStyleRandomCars, SkipCareerIntro, ShowTimeOfDay, BetterRandomRaces, AllowMultipleInstances, TimeBugFix, NoCatchUp, CarSkinFix, ImmobileColFix, NFSU2StyleLookBackCamera, NoRevLimiter, SkipNISs, ExpandMemoryPools, ShowPresetCarsInFE, AllowLongerProfileNames, DDayFix, BustedNISFix, ShowLanguageSelectScreen, DoScreenPrintf, WorldMapAnywhere, SkipTrackAnywhere;
-DWORD selectedCar, careerCar, raceOptions, Strings, HeatLevelAddr, VTecx, StartingCashDWORD, GameState;
+u32 selectedCar, careerCar, raceOptions, Strings, HeatLevelAddr, VTecx, StartingCashDWORD, GameState;
 
-bool forceHeatLevel = 0, carHackEnabled = 0, AutoDrive, ToggleCops = 1;
-DWORD ButtonResult = 0;
+bool forceHeatLevel = false, carHackEnabled = false, AutoDrive = false, ToggleCops = true;
+u32 ButtonResult = 0;
 
 #include "DialogInterfaceHook.h"
 #include "LanguageSelectScreen.h"
@@ -43,23 +47,23 @@ inline void Init()
 	EnableSaveLoadHotPos = iniReader.ReadInteger("Hotkeys", "EnableSaveLoadHotPos", 0) != 0;
 
 	// LapControllers
-	minLaps = iniReader.ReadInteger("LapControllers", "Minimum", 0);
-	maxLaps = iniReader.ReadInteger("LapControllers", "Maximum", 127);
-	maxLapsRandomQR = iniReader.ReadInteger("LapControllers", "RandomRace", 127);
+	minLaps = (u8)iniReader.ReadInteger("LapControllers", "Minimum", 0);
+	maxLaps = (u8)iniReader.ReadInteger("LapControllers", "Maximum", 127);
+	maxLapsRandomQR = (u8)iniReader.ReadInteger("LapControllers", "RandomRace", 127);
 	unfreezeKO = iniReader.ReadInteger("LapControllers", "UnfreezeKO", 1) != 0;
 
 	// OpponentControllers
-	minOpponents = iniReader.ReadInteger("OpponentControllers", "Minimum", 0);
-	maxOpponents = iniReader.ReadInteger("OpponentControllers", "Maximum", 6);
-	maxOpponentsRandomQR = iniReader.ReadInteger("OpponentControllers", "RandomRace", 6);
-	MaxUniqueOpponentCars = iniReader.ReadInteger("OpponentControllers", "MaxUniqueOpponentCars", 3);
+	minOpponents = (u8)iniReader.ReadInteger("OpponentControllers", "Minimum", 0);
+	maxOpponents = (u8)iniReader.ReadInteger("OpponentControllers", "Maximum", 6);
+	maxOpponentsRandomQR = (u8)iniReader.ReadInteger("OpponentControllers", "RandomRace", 6);
+	MaxUniqueOpponentCars = (u8)iniReader.ReadInteger("OpponentControllers", "MaxUniqueOpponentCars", 3);
 	MoreCarsForOpponents = iniReader.ReadInteger("OpponentControllers", "MoreCarsForOpponents", 0) != 0;
 	CarbonStyleRandomCars = iniReader.ReadInteger("OpponentControllers", "CarbonStyleRandomCars", 0) != 0;
 
 	// TrafficControllers
-	lowTraffic = iniReader.ReadInteger("TrafficControllers", "Low", 10);
-	medTraffic = iniReader.ReadInteger("TrafficControllers", "Medium", 30);
-	highTraffic = iniReader.ReadInteger("TrafficControllers", "High", 50);
+	lowTraffic = (u8)iniReader.ReadInteger("TrafficControllers", "Low", 10);
+	medTraffic = (u8)iniReader.ReadInteger("TrafficControllers", "Medium", 30);
+	highTraffic = (u8)iniReader.ReadInteger("TrafficControllers", "High", 50);
 
 	// Menu
 	HideOnline = iniReader.ReadInteger("Menu", "ShowOnline", 1) == 0;
@@ -71,11 +75,11 @@ inline void Init()
 	ShowDebugCarCustomize = iniReader.ReadInteger("Menu", "ShowDebugCarCustomize", 0) != 0;
 	ShowDebugEventID = iniReader.ReadInteger("Menu", "ShowDebugEventID", 0) != 0;
 	ShowTimeOfDay = iniReader.ReadInteger("Menu", "ShowTimeOfDay", 0) != 0;
-	ShowHiddenTracks = iniReader.ReadInteger("Menu", "ShowHiddenTracks", 0);
+	ShowHiddenTracks = (u8)iniReader.ReadInteger("Menu", "ShowHiddenTracks", 0);
 	BetterRandomRaces = iniReader.ReadInteger("Menu", "BetterRandomRaces", 0) != 0;
-	maxBlacklist = iniReader.ReadInteger("Menu", "MaximumBlacklistRival", 15);
+	maxBlacklist = (u8)iniReader.ReadInteger("Menu", "MaximumBlacklistRival", 15);
 	ReplayBlacklistRaces = iniReader.ReadInteger("Menu", "ReplayBlacklistRaces", 0) != 0;
-	csBlacklist = iniReader.ReadInteger("Menu", "ChallengeSeriesBlacklist", 19);
+	csBlacklist = (u8)iniReader.ReadInteger("Menu", "ChallengeSeriesBlacklist", 19);
 	randomizeCount = iniReader.ReadInteger("Menu", "RandomizeCount", 30);
 	SplashScreenTimeLimit = iniReader.ReadFloat("Menu", "SplashScreenTimeLimit", 30.0f);
 	CarSelectTireSteerAngle = iniReader.ReadFloat("Menu", "CarSelectTireSteerAngle", 21.6723f);
@@ -97,7 +101,7 @@ inline void Init()
 	removeSceneryGroupDoor = iniReader.ReadInteger("Gameplay", "RemoveOldBridgeBarrier", 0) != 0;
 	removePlayerBarriers = iniReader.ReadInteger("Gameplay", "RemoveNeonBarriers", 0) != 0;
 	CarbonStyleRaceProgress = iniReader.ReadInteger("Gameplay", "ShowPercentOn1LapRaces", 1) != 0;
-	CarbonStyleTirePop = iniReader.ReadInteger("Gameplay", "BetterHandlingWithFlatTires", 0);
+	CarbonStyleTirePop = (u8)iniReader.ReadInteger("Gameplay", "BetterHandlingWithFlatTires", 0);
 	StartingCashDWORD = iniReader.ReadInteger("Gameplay", "StartingCash", 0);
 	UG2SaveMoney = iniReader.ReadInteger("Gameplay", "AwardedCash", 10000);
 	WorldMapAnywhere = iniReader.ReadInteger("Gameplay", "WorldMapAnywhere", 1) != 0;
@@ -106,15 +110,15 @@ inline void Init()
 	ForceBlackEdition = iniReader.ReadInteger("Gameplay", "ForceBlackEdition", 1) != 0;
 	eatSomeBurgers = iniReader.ReadInteger("Gameplay", "UnlockBurgerKingChallenge", 0) != 0;
 	EnableMaxPerfOnShop = iniReader.ReadInteger("Gameplay", "EnableMaxPerformanceOnShop", 1) != 0;
-	ShowAllCarsInFE = iniReader.ReadInteger("Gameplay", "ShowAllCarsInFE", 0);
+	ShowAllCarsInFE = (u8)iniReader.ReadInteger("Gameplay", "ShowAllCarsInFE", 0);
 	// ShowPresetCarsInFE = iniReader.ReadInteger("Gameplay", "ShowPresetCarsInFE", 0);
 	NoCatchUp = iniReader.ReadInteger("Gameplay", "NoCatchUp", 0) != 0;
 	NoRevLimiter = iniReader.ReadInteger("Gameplay", "NoRevLimiter", 0) != 0;
 	NosTrailRepeatCount = iniReader.ReadInteger("Gameplay", "NosTrailRepeatCount", 8);
-	SelectableMarkerCount = iniReader.ReadInteger("Gameplay", "SelectableMarkerCount", 2);
-	PurchasedCarLimit = iniReader.ReadInteger("Gameplay", "PurchasedCarLimit", 10);
-	ImpoundStrikesCount = iniReader.ReadInteger("Gameplay", "ImpoundStrikesCount", 3);
-	MaxImpoundStrikesCount = iniReader.ReadInteger("Gameplay", "MaximumImpoundStrikesCount", 5);
+	SelectableMarkerCount = (u8)iniReader.ReadInteger("Gameplay", "SelectableMarkerCount", 2);
+	PurchasedCarLimit = (u8)iniReader.ReadInteger("Gameplay", "PurchasedCarLimit", 10);
+	ImpoundStrikesCount = (u8)iniReader.ReadInteger("Gameplay", "ImpoundStrikesCount", 3);
+	MaxImpoundStrikesCount = (u8)iniReader.ReadInteger("Gameplay", "MaximumImpoundStrikesCount", 5);
 	SBRechargeTime = iniReader.ReadFloat("Gameplay", "SBRechargeTime", 25.0f);
 	SBRechargeSpeedLimit = iniReader.ReadFloat("Gameplay", "SBRechargeSpeedLimit", 100.0f);
 	SBMassMultiplier = iniReader.ReadFloat("Gameplay", "SBMassMultiplier", 2.0f);
@@ -216,75 +220,75 @@ inline void Init()
 	// Allow Multiple Instances
 	if (AllowMultipleInstances)
 	{
-		injector::WriteMemory<unsigned char>(0x6665A1, 0xEB, true);
+		injector::WriteMemory<u8>(0x6665A1, 0xEB, true);
 	}
 
 	// Expand Memory Pools (ty Berkay)
 	if (ExpandMemoryPools)
 	{
-		injector::WriteMemory<short>(0x5F7396, 0x2C80, true); // GManager::PreloadTransientVaults (0x2C8000)
-		injector::WriteMemory<short>(0x5F73B2, 0x2C80, true);
+		injector::WriteMemory<u16>(0x5F7396, 0x2C80, true); // GManager::PreloadTransientVaults (0x2C8000)
+		injector::WriteMemory<u16>(0x5F73B2, 0x2C80, true);
 
-		injector::WriteMemory<unsigned char>(0x665FDC, 0x80, true); // InitializeEverything (0x8000)
+		injector::WriteMemory<u8>(0x665FDC, 0x80, true); // InitializeEverything (0x8000)
 
-		injector::WriteMemory<DWORD>(0x8F5790, 0x0BE6E0, true); // FEngMemoryPoolSize (InitFEngMemoryPool)
-		injector::WriteMemory<DWORD>(0x8F7EF0, 0x01CC00, true); // CarLoaderPoolSizes
+		injector::WriteMemory<u32>(0x8F5790, 0x0BE6E0, true); // FEngMemoryPoolSize (InitFEngMemoryPool)
+		injector::WriteMemory<u32>(0x8F7EF0, 0x01CC00, true); // CarLoaderPoolSizes
 	}
 
 	// Remove 1-8 Lap Restriction
-	injector::WriteMemory<unsigned char>(0x7AC3EC, minLaps, true); // Decrease lap count min lap controller
-	injector::WriteMemory<unsigned char>(0x7AC3F0, maxLaps, true); // Decrease lap count max lap controller
-	injector::WriteMemory<unsigned char>(0x7AC405, minLaps, true); // Increase lap count min lap controller
-	injector::WriteMemory<unsigned char>(0x7AC401, maxLaps, true); // Increase lap count max lap controller
+	injector::WriteMemory<u8>(0x7AC3EC, minLaps, true); // Decrease lap count min lap controller
+	injector::WriteMemory<u8>(0x7AC3F0, maxLaps, true); // Decrease lap count max lap controller
+	injector::WriteMemory<u8>(0x7AC405, minLaps, true); // Increase lap count min lap controller
+	injector::WriteMemory<u8>(0x7AC401, maxLaps, true); // Increase lap count max lap controller
 	// LAN Lobby
-	injector::WriteMemory<unsigned char>(0x556bb5, maxLaps, true);
-	injector::WriteMemory<unsigned char>(0x556bde, maxLaps, true);
-	injector::WriteMemory<unsigned char>(0x556bc4, minLaps, true);
-	injector::WriteMemory<unsigned char>(0x556bcf, minLaps, true);
+	injector::WriteMemory<u8>(0x556bb5, maxLaps, true);
+	injector::WriteMemory<u8>(0x556bde, maxLaps, true);
+	injector::WriteMemory<u8>(0x556bc4, minLaps, true);
+	injector::WriteMemory<u8>(0x556bcf, minLaps, true);
 
 	// Number of bots - Note: 4th and beyond opponents gets bugged cars.
-	injector::WriteMemory<unsigned char>(0x7abff9, minOpponents, true); // Decrease opponents count min opponent controller
-	injector::WriteMemory<unsigned char>(0x7abffd, maxOpponents + 0x01, true); // Decrease opponents count max opponent controller
-	injector::WriteMemory<unsigned char>(0x7ac01a, minOpponents, true); // Increase opponents count min opponent controller
-	injector::WriteMemory<unsigned char>(0x7ac00e, maxOpponents + 0x01, true); // Increase opponents count max opponent controller
+	injector::WriteMemory<u8>(0x7abff9, minOpponents, true); // Decrease opponents count min opponent controller
+	injector::WriteMemory<u8>(0x7abffd, maxOpponents + 0x01, true); // Decrease opponents count max opponent controller
+	injector::WriteMemory<u8>(0x7ac01a, minOpponents, true); // Increase opponents count min opponent controller
+	injector::WriteMemory<u8>(0x7ac00e, maxOpponents + 0x01, true); // Increase opponents count max opponent controller
 
 	// Maximum Unique Opponent Cars (Increasing this value also increases opponent cars' variety)
-	injector::WriteMemory<unsigned char>(0x61DE27, MaxUniqueOpponentCars, true);
+	injector::WriteMemory<u8>(0x61DE27, MaxUniqueOpponentCars, true);
 
 	// Random Race Laps and Opponents
-	injector::WriteMemory<unsigned char>(0x56DCC1, maxOpponentsRandomQR, true); // Random Race Max Opponent Controller
-	injector::WriteMemory<unsigned char>(0x56DCE9, maxLapsRandomQR, true); // Random Race Max Lap Controller
+	injector::WriteMemory<u8>(0x56DCC1, maxOpponentsRandomQR, true); // Random Race Max Opponent Controller
+	injector::WriteMemory<u8>(0x56DCE9, maxLapsRandomQR, true); // Random Race Max Lap Controller
 
 	// Traffic Density Controllers (0-100)
-	injector::WriteMemory<unsigned char>(0x56dd9E, lowTraffic, true); // Low (10)
-	injector::WriteMemory<unsigned char>(0x56dd9A, medTraffic, true); // Medium (30)
-	injector::WriteMemory<unsigned char>(0x56dd96, highTraffic, true); // High (50)
+	injector::WriteMemory<u8>(0x56dd9E, lowTraffic, true); // Low (10)
+	injector::WriteMemory<u8>(0x56dd9A, medTraffic, true); // Medium (30)
+	injector::WriteMemory<u8>(0x56dd96, highTraffic, true); // High (50)
 
 	// Blacklist Max Rival Controllers
 	if (maxBlacklist == 0) // Unlimited blacklists
 	{
 		// Enable BL 0 for decrement
 		injector::MakeNOP(0x551455, 7, true);
-		injector::WriteMemory<unsigned char>(0x551455, 0x31, true);
-		injector::WriteMemory<unsigned char>(0x551456, 0xD2, true);
+		injector::WriteMemory<u8>(0x551455, 0x31, true);
+		injector::WriteMemory<u8>(0x551456, 0xD2, true);
 
 		// Enable BL 0 for increment
 		injector::MakeNOP(0x55a571, 7, true);
-		injector::WriteMemory<unsigned char>(0x55a571, 0x31, true);
-		injector::WriteMemory<unsigned char>(0x55a572, 0xC0, true);
+		injector::WriteMemory<u8>(0x55a571, 0x31, true);
+		injector::WriteMemory<u8>(0x55a572, 0xC0, true);
 
 		// Remove Maximum Restriction
-		injector::WriteMemory<unsigned char>(0x55a56c, 0xeb, true);
+		injector::WriteMemory<u8>(0x55a56c, 0xeb, true);
 
 		// Remove Minimum Restriction
 		injector::MakeNOP(0x551460, 5, true);
 	}
 	else // Normal behaviour
 	{
-		injector::WriteMemory<unsigned char>(0x551461, maxBlacklist, true);
-		injector::WriteMemory<unsigned char>(0x551473, maxBlacklist, true);
-		injector::WriteMemory<unsigned char>(0x55a555, maxBlacklist, true);
-		injector::WriteMemory<unsigned char>(0x55a566, maxBlacklist, true);
+		injector::WriteMemory<u8>(0x551461, maxBlacklist, true);
+		injector::WriteMemory<u8>(0x551473, maxBlacklist, true);
+		injector::WriteMemory<u8>(0x55a555, maxBlacklist, true);
+		injector::WriteMemory<u8>(0x55a566, maxBlacklist, true);
 	}
 
 	// Remove restrictions for new save games
@@ -298,25 +302,25 @@ inline void Init()
 	if (ReplayBlacklistRaces)
 	{
 		injector::MakeNOP(0x5FD1B9, 2, true); //allow challenging defeated rival
-		injector::WriteMemory<unsigned char>(0x52F202, 0x00, true); // remove defeated flag
+		injector::WriteMemory<u8>(0x52F202, 0x00, true); // remove defeated flag
 
-		injector::WriteMemory<unsigned char>(0x603269, 0xEB, true); // fix boss race stats getting reset
+		injector::WriteMemory<u8>(0x603269, 0xEB, true); // fix boss race stats getting reset
 
 		injector::MakeJMP(0x6243EF, ReplayBlacklistFixCodeCave, true);
 		injector::MakeNOP(0x6243C8, 6, true); // visuals fix
 
-		injector::WriteMemory<DWORD>(0x60075C, 0x91CA3C, true);
+		injector::WriteMemory<u32>(0x60075C, 0x91CA3C, true);
 		injector::MakeRangedNOP(0x600760, 0x60076B, true); // Graphics and name fixes
 	}
 
 	// Challenge Series Bin
-	injector::WriteMemory<unsigned char>(0x7ae969, csBlacklist, true);
+	injector::WriteMemory<u8>(0x7ae969, csBlacklist, true);
 
 	// Fix Unexistent Bin Crash?? (EXPERIMENTAL)
 	if (maxBlacklist != 15 || csBlacklist != 19)
 	{
-		injector::WriteMemory<unsigned char>(0x5e39c6, 0x01, true);
-		injector::WriteMemory<unsigned char>(0x5e39c7, 0xC8, true);
+		injector::WriteMemory<u8>(0x5e39c6, 0x01, true);
+		injector::WriteMemory<u8>(0x5e39c7, 0xC8, true);
 	}
 
 	// Race Speed Multiplier
@@ -341,23 +345,23 @@ inline void Init()
 	// Remove Race Barriers and Locked Areas
 	if (removePlayerBarriers)
 	{
-		injector::WriteMemory<unsigned char>(0x8B282B, 0x4A, true);
-		injector::WriteMemory<unsigned char>(0x8B2838, 0x4A, true);
-		injector::WriteMemory<unsigned char>(0x8B2844, 0x4A, true);
+		injector::WriteMemory<u8>(0x8B282B, 0x4A, true);
+		injector::WriteMemory<u8>(0x8B2838, 0x4A, true);
+		injector::WriteMemory<u8>(0x8B2844, 0x4A, true);
 
 		// Always show whole map
-		injector::WriteMemory<unsigned char>(0x89B15D, 0, true);
-		injector::WriteMemory<unsigned char>(0x57bf01, 0xEB, true);
-		injector::WriteMemory<unsigned char>(0x57bf19, 0xEB, true);
-		injector::WriteMemory<unsigned char>(0x57bf5f, 0xEB, true);
-		injector::WriteMemory<unsigned char>(0x57bf7c, 0xEB, true);
+		injector::WriteMemory<u8>(0x89B15D, 0, true);
+		injector::WriteMemory<u8>(0x57bf01, 0xEB, true);
+		injector::WriteMemory<u8>(0x57bf19, 0xEB, true);
+		injector::WriteMemory<u8>(0x57bf5f, 0xEB, true);
+		injector::WriteMemory<u8>(0x57bf7c, 0xEB, true);
 	}
 
 	// Remove Old Bridge Area Barrier
 	if (removeSceneryGroupDoor)
 	{
-		injector::WriteMemory<unsigned char>(0x8B2817, 0x20, true);
-		injector::WriteMemory<unsigned char>(0x8B2810, 0x54, true);
+		injector::WriteMemory<u8>(0x8B2817, 0x20, true);
+		injector::WriteMemory<u8>(0x8B2810, 0x54, true);
 	}
 
 	// Show Hidden Tracks in QR Track select
@@ -387,7 +391,7 @@ inline void Init()
 
 	// Remove online option from main menu
 	if (HideOnline)
-		injector::WriteMemory<unsigned char>(0x5450f9, 0x46, true);
+		injector::WriteMemory<u8>(0x5450f9, 0x46, true);
 
 	if (ShowOnlineOpts) 
 		injector::MakeNOP(0x5290B2, 2, true); // Show Online Options menu
@@ -399,20 +403,20 @@ inline void Init()
 	// Add Debug and Preset Categories to Car Select screen
 	if (EnablePresetAndDebugCars)
 	{
-		injector::WriteMemory<unsigned char>(0x7BF9E9, 0x20, true);
-		injector::WriteMemory<unsigned char>(0x7BF9FA, 0x20, true);
+		injector::WriteMemory<u8>(0x7BF9E9, 0x20, true);
+		injector::WriteMemory<u8>(0x7BF9FA, 0x20, true);
 		// LAN Lobby
-		injector::WriteMemory<unsigned char>(0x556787, 0x20, true);
-		injector::WriteMemory<unsigned char>(0x5567bd, 0x20, true);
-		injector::WriteMemory<unsigned char>(0x5567e7, 0x20, true);
-		injector::WriteMemory<unsigned char>(0x556821, 0x20, true);
+		injector::WriteMemory<u8>(0x556787, 0x20, true);
+		injector::WriteMemory<u8>(0x5567bd, 0x20, true);
+		injector::WriteMemory<u8>(0x5567e7, 0x20, true);
+		injector::WriteMemory<u8>(0x556821, 0x20, true);
 	}
 
 	// Rain Options
 	if (AlwaysRain)
 	{
-		injector::WriteMemory<unsigned char>(0x9B0A30, 0x01, true);
-		injector::WriteMemory<unsigned char>(0x758293, 0xEB, true); // Road Reflection Fix??
+		injector::WriteMemory<u8>(0x9B0A30, 0x01, true);
+		injector::WriteMemory<u8>(0x758293, 0xEB, true); // Road Reflection Fix??
 	}
 	injector::WriteMemory<float>(0x904B38, RoadReflection, true);
 	injector::WriteMemory<float>(0x904B38, RoadReflection, true);
@@ -426,22 +430,22 @@ inline void Init()
 	// Misc Options
 	if (SkipMovies)
 	{
-		injector::WriteMemory<unsigned char>(0x926144, SkipMovies, true);
+		injector::WriteMemory<u8>(0x926144, SkipMovies, true);
 	}
 
 	if (SkipNISs)
 	{
-		injector::WriteMemory<unsigned char>(0x9260A4, SkipNISs, true);
+		injector::WriteMemory<u8>(0x9260A4, SkipNISs, true);
 	}
 
 	if (!EnableSound)
 	{
-		injector::WriteMemory<unsigned char>(0x8F86F8, EnableSound, true);
+		injector::WriteMemory<u8>(0x8F86F8, EnableSound, true);
 	}
 
 	if (!EnableMusic)
 	{
-		injector::WriteMemory<unsigned char>(0x8F86FC, EnableMusic, true);
+		injector::WriteMemory<u8>(0x8F86FC, EnableMusic, true);
 	}
 
 	if (ShowMessage)
@@ -451,8 +455,8 @@ inline void Init()
 
 	if (SkipCareerIntro)
 	{
-		injector::WriteMemory<unsigned char>(0x926125, 1, true); // SkipDDayRaces
-		injector::WriteMemory<unsigned char>(0x926126, 1, true); // SkipCareerIntro
+		injector::WriteMemory<u8>(0x926125, 1, true); // SkipDDayRaces
+		injector::WriteMemory<u8>(0x926126, 1, true); // SkipCareerIntro
 	}
 
 	// Force Car and Tire LOD
@@ -473,7 +477,7 @@ inline void Init()
 		injector::MakeNOP(0x595DE2, 2, true);
 		injector::MakeNOP(0x595DE7, 2, true);
 		injector::MakeNOP(0x595DEC, 2, true);
-		injector::WriteMemory<unsigned char>(0x595DF0, 0xFF, true);
+		injector::WriteMemory<u8>(0x595DF0, 0xFF, true);
 	}
 
 	// Splash Screen Time Limit
@@ -498,14 +502,14 @@ inline void Init()
 		// call 0x5FAA20 (Just moved this call up)
 		injector::MakeCALL(0x57AA2F, 0x5FAA20, true);
 		// cmp dword ptr ds: [esi+0x3C],0x01 (if lap count = 1)
-		injector::WriteMemory<unsigned int>(0x57AA34, 0x13C7E83, true);
+		injector::WriteMemory<u32>(0x57AA34, 0x13C7E83, true);
 		//je 0x57AA73 (If true, use COMPLETED %)
-		injector::WriteMemory<unsigned short int>(0x57AA38, 0x3974, true);
+		injector::WriteMemory<u16>(0x57AA38, 0x3974, true);
 	}
 
 	// Burger King
 	if (eatSomeBurgers)
-		injector::WriteMemory<unsigned char>(0x576A8D, 0xEB, true);
+		injector::WriteMemory<u8>(0x576A8D, 0xEB, true);
 
 	// Special Vinyl Category
 	if (moreVinyls)
@@ -517,56 +521,56 @@ inline void Init()
 		injector::MakeJMP(0x7BD26F, VinylMenuCodeCave2, true);
 
 		// Category Fixes
-		//injector::WriteMemory<unsigned char>(0x7A5208, 0x0A, true); shows new icon
-		injector::WriteMemory<unsigned char>(0x7A5823, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7AFE90, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7B600C, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7B7436, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7B75A2, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7BAEC3, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7BAF10, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7bca3c, 0x0A, true);
-		injector::WriteMemory<unsigned char>(0x7c0ae7, 0x0A, true);
+		//injector::WriteMemory<u8>(0x7A5208, 0x0A, true); shows new icon
+		injector::WriteMemory<u8>(0x7A5823, 0x0A, true);
+		injector::WriteMemory<u8>(0x7AFE90, 0x0A, true);
+		injector::WriteMemory<u8>(0x7B600C, 0x0A, true);
+		injector::WriteMemory<u8>(0x7B7436, 0x0A, true);
+		injector::WriteMemory<u8>(0x7B75A2, 0x0A, true);
+		injector::WriteMemory<u8>(0x7BAEC3, 0x0A, true);
+		injector::WriteMemory<u8>(0x7BAF10, 0x0A, true);
+		injector::WriteMemory<u8>(0x7bca3c, 0x0A, true);
+		injector::WriteMemory<u8>(0x7c0ae7, 0x0A, true);
 	}
 
 	// Fix (ignore) starting heat level when a challenge executed from quick race screen
-	// injector::WriteMemory<unsigned char>(0x56DD55, 0xEB, true);
+	// injector::WriteMemory<u8>(0x56DD55, 0xEB, true);
 
 	// Unlock all things
 	if (UnlockAllThings)
 	{
-		injector::WriteMemory<unsigned char>(0x926124, 0x01, true);
+		injector::WriteMemory<u8>(0x926124, 0x01, true);
 	}
 
 	if (WheelFix) // Fix Invisible Wheels
-		injector::WriteMemory<unsigned char>(0x74251D, 0x01, true);
+		injector::WriteMemory<u8>(0x74251D, 0x01, true);
 
 	// Garage Hacks
 	if (GarageZoom)
 	{
 		injector::MakeNOP(0x476B04, 5, true);
-		injector::WriteMemory<unsigned char>(0x476B04, 0xB0, true);
-		injector::WriteMemory<unsigned char>(0x476B05, 0x01, true);
+		injector::WriteMemory<u8>(0x476B04, 0xB0, true);
+		injector::WriteMemory<u8>(0x476B05, 0x01, true);
 	}
 	if (GarageRotate)
 	{
 		injector::MakeNOP(0x476AC3, 5, true);
-		injector::WriteMemory<unsigned char>(0x476AC3, 0xB0, true);
-		injector::WriteMemory<unsigned char>(0x476AC4, 0x01, true);
+		injector::WriteMemory<u8>(0x476AC3, 0xB0, true);
+		injector::WriteMemory<u8>(0x476AC4, 0x01, true);
 	}
 	if (GarageShowcase)
 	{
 		injector::MakeNOP(0x7A201B, 5, true);
-		injector::WriteMemory<unsigned char>(0x7A201B, 0xB0, true);
-		injector::WriteMemory<unsigned char>(0x7A201C, 0x01, true);
+		injector::WriteMemory<u8>(0x7A201B, 0xB0, true);
+		injector::WriteMemory<u8>(0x7A201C, 0x01, true);
 	}
 
 	// Force Black Edition
 	if (ForceBlackEdition)
 	{
 		injector::MakeNOP(0x5994E6, 3, true);
-		injector::WriteMemory<unsigned char>(0x5994E6, 0xB0, true);
-		injector::WriteMemory<unsigned char>(0x5994E7, 0x01, true);
+		injector::WriteMemory<u8>(0x5994E6, 0xB0, true);
+		injector::WriteMemory<u8>(0x5994E7, 0x01, true);
 	}
 
 	// World Animation Speed
@@ -575,14 +579,14 @@ inline void Init()
 	// Split-Screen Fix (Experimental)
 	if (ExperimentalSplitScreenFix)
 	{
-		injector::WriteMemory<unsigned char>(0x7a3f68, 0x0D, true); // Fix Player 2 Ready control
-		injector::WriteMemory<unsigned char>(0x666eb3, 0xEB, true); // Fix loading screen crash
+		injector::WriteMemory<u8>(0x7a3f68, 0x0D, true); // Fix Player 2 Ready control
+		injector::WriteMemory<u8>(0x666eb3, 0xEB, true); // Fix loading screen crash
 		injector::MakeNOP(0x6cfc03, 2, true); // Fix black screen??
 
 		// Add split screen to qr menu
 		injector::MakeJMP(0x7AA821, SplitScreenCodeCave, true);
 		// SplitScreen_vtbl
-		injector::WriteMemory<DWORD>(0x901400, 0x7B4980, true);
+		injector::WriteMemory<u32>(0x901400, 0x7B4980, true);
 		injector::WriteMemory(0x901404, &SplitScreen_React, true);
 	}
 
@@ -591,24 +595,24 @@ inline void Init()
 		injector::MakeCALL(0x005A3260, GetGameVersionNumberStringHook, true);
 
 	// Starting Cash
-	injector::WriteMemory<unsigned char>(0x56D7D3, 0x81, true); // add
-	injector::WriteMemory<unsigned char>(0x56D7D4, 0x41, true); // to [ecx]
-	injector::WriteMemory<unsigned char>(0x56D7D5, 0x0C, true); // + 0x0c
-	injector::WriteMemory<DWORD>(0x56D7D6, StartingCashDWORD, true); // Starting Cash
-	injector::WriteMemory<unsigned char>(0x56D7DA, 0xC2, true); // ret 0004
-	injector::WriteMemory<unsigned char>(0x56D7DB, 0x04, true);
-	injector::WriteMemory<unsigned char>(0x56D7DC, 0x00, true);
+	injector::WriteMemory<u8>(0x56D7D3, 0x81, true); // add
+	injector::WriteMemory<u8>(0x56D7D4, 0x41, true); // to [ecx]
+	injector::WriteMemory<u8>(0x56D7D5, 0x0C, true); // + 0x0c
+	injector::WriteMemory<u32>(0x56D7D6, StartingCashDWORD, true); // Starting Cash
+	injector::WriteMemory<u8>(0x56D7DA, 0xC2, true); // ret 0004
+	injector::WriteMemory<u8>(0x56D7DB, 0x04, true);
+	injector::WriteMemory<u8>(0x56D7DC, 0x00, true);
 
 	// Cash for Underground 2 save
 	if (UG2SaveMoney < -29999) UG2SaveMoney = -29999; // prevents a potential softlock (you'll still need to edit the cost of a car though)
 	if (UG2SaveMoney < 0)
 	{
-		injector::WriteMemory<uint8_t>(0x0056D7CC + 1, 0x69, true); // sub instead of add
-		injector::WriteMemory<uint32_t>(0x0056D7CC + 3, abs(UG2SaveMoney), true); // positive value because uint
+		injector::WriteMemory<u8>(0x0056D7CC + 1, 0x69, true); // sub instead of add
+		injector::WriteMemory<u32>(0x0056D7CC + 3, abs(UG2SaveMoney), true); // positive value because uint
 	}
 	else
 	{
-		injector::WriteMemory<uint32_t>(0x0056D7CC + 3, UG2SaveMoney, true);
+		injector::WriteMemory<u32>(0x0056D7CC + 3, UG2SaveMoney, true);
 	}
 
 	// Car size hack
@@ -653,7 +657,7 @@ inline void Init()
 	}
 
 	// Load Any Save Game
-	// injector::WriteMemory<unsigned char>(0x5ACD4F, 0xEB, true); // Skip hash check, breaks compatibility for non-exopts users
+	// injector::WriteMemory<u8>(0x5ACD4F, 0xEB, true); // Skip hash check, breaks compatibility for non-exopts users
 	injector::MakeNOP(0x5ACBFA, 6, true); // Skip modded game check
 
 	// Max Performance on Shop
@@ -696,17 +700,17 @@ inline void Init()
 
 	// Remove Busted Screen Frame
 	if (CarbonStyleBustedScreen)
-		injector::WriteMemory<unsigned char>(0x8948F8, 0x00, true);
+		injector::WriteMemory<u8>(0x8948F8, 0x00, true);
 
 	// Show Debug Car Customize
 	if (ShowDebugCarCustomize)
 	{
-		injector::WriteMemory<DWORD>(0x544F80, 0x1AFD5BE6, true); // "My Cars"
-		injector::WriteMemory<DWORD>(0x544F85, 0x74CE8C0B, true); // UI_ICON_DEBUG
+		injector::WriteMemory<u32>(0x544F80, 0x1AFD5BE6, true); // "My Cars"
+		injector::WriteMemory<u32>(0x544F85, 0x74CE8C0B, true); // UI_ICON_DEBUG
 		injector::MakeNOP(0x544FA6, 7, true); // UAT Fix
 		injector::MakeJMP(0x5451D7, 0x544F5D, true); // Jump to unused?? duplicate menu option
-		injector::WriteMemory<DWORD>(0x544F92, 0x89CADC, true); // Menu Code To Execute
-		injector::WriteMemory<DWORD>(0x53CED7, 0x89FAD4, true); // "UI_DebugCarCustomize.fng"
+		injector::WriteMemory<u32>(0x544F92, 0x89CADC, true); // Menu Code To Execute
+		injector::WriteMemory<u32>(0x53CED7, 0x89FAD4, true); // "UI_DebugCarCustomize.fng"
 	}
 
 	// Show Debug Event ID
@@ -726,18 +730,18 @@ inline void Init()
 	if (PursuitActionMode)
 	{
 		// Replace Race Table (0x2283ECAF) with Heat Table (0xD4B0CC11)
-		injector::WriteMemory<DWORD>(0x403476, 0xD4B0CC11, true);
-		injector::WriteMemory<DWORD>(0x409176, 0xD4B0CC11, true);
+		injector::WriteMemory<u32>(0x403476, 0xD4B0CC11, true);
+		injector::WriteMemory<u32>(0x409176, 0xD4B0CC11, true);
 
 		// Replace Race Support (0xE5332008) with Heat Support (0xF3918F68)
-		injector::WriteMemory<DWORD>(0x403496, 0xF3918F68, true);
-		injector::WriteMemory<DWORD>(0x4091D9, 0xF3918F68, true);
+		injector::WriteMemory<u32>(0x403496, 0xF3918F68, true);
+		injector::WriteMemory<u32>(0x4091D9, 0xF3918F68, true);
 
 		// Can Spawn Roadblocks in Quick Race - AIPursuit::RequestRoadBlock
 		injector::MakeNOP(0x419519, 6, true);
 
 		// Cops Can Call Support in Quick Race - AIPursuit::RequestGroundSupport
-		injector::WriteMemory<unsigned char>(0x4196FF, 0xEB, true);
+		injector::WriteMemory<u8>(0x4196FF, 0xEB, true);
 		injector::MakeNOP(0x41974B, 2, true);
 
 		// Helicopter - AIPursuit::CopRequest
@@ -747,48 +751,48 @@ inline void Init()
 	// More Stock Cars for Newly Created Save Games
 	if (ShowAllCarsInFE != 0)
 	{
-		injector::WriteMemory<unsigned char>(0x926127, 0x01, true);
-		injector::WriteMemory<unsigned char>(0x581663, ShowAllCarsInFE, true); // Add them to desired category
+		injector::WriteMemory<u8>(0x926127, 0x01, true);
+		injector::WriteMemory<u8>(0x581663, ShowAllCarsInFE, true); // Add them to desired category
 	}
 
 	// Preset Mode (Only for experts)
-	/*if (ShowPresetCarsInFE)
+	if (ShowPresetCarsInFE)
 	{
-		injector::WriteMemory<unsigned char>(0x926129, 0x01, true);
+		injector::WriteMemory<u8>(0x926129, 0x01, true);
 
 		// Disable bonus cars creation to save tuning slots
 		injector::MakeRangedNOP(0x590E5E, 0x590E68, true);
-		injector::WriteMemory<unsigned char>(0x590E68, 0xEB, true);
+		injector::WriteMemory<u8>(0x590E68, 0xEB, true);
 
 		// Only use Stock, My Cars and Preset categories in Car Select.
 		injector::MakeRangedNOP(0x7BF9B4, 0x7BF9B6, true);
-	}*/
+	}
 
 	// More Opponent Cars
 	if (MoreCarsForOpponents)
 	{
 		injector::MakeRangedNOP(0x61DA2B, 0x61DA30, true); // force RandomOpponent = 1
-		injector::WriteMemory<unsigned char>(0x61DA2B, 0xB0, true); // Game_FindPerformanceCandidates
-		injector::WriteMemory<unsigned char>(0x61DA2C, 0x01, true); // Opponents can use bonus cars and cop cars
+		injector::WriteMemory<u8>(0x61DA2B, 0xB0, true); // Game_FindPerformanceCandidates
+		injector::WriteMemory<u8>(0x61DA2C, 0x01, true); // Opponents can use bonus cars and cop cars
 	}
 
 	// Uncensored Busted Screen
 	if (UncensoredBustedScreen)
 	{
-		injector::WriteMemory<unsigned char>(0x6231D6, 0x00, true); // FacePixelation::mPixelationOn = 0
-		injector::WriteMemory<unsigned char>(0x623227, 0x00, true);
+		injector::WriteMemory<u8>(0x6231D6, 0x00, true); // FacePixelation::mPixelationOn = 0
+		injector::WriteMemory<u8>(0x623227, 0x00, true);
 	}
 
 	// Show Pursuit Cops
-	injector::WriteMemory<unsigned char>(0x8F3AAC, ShowPursuitCops, true);
+	injector::WriteMemory<u8>(0x8F3AAC, ShowPursuitCops, true);
 
 	// Show Non-Pursuit Cops
-	injector::WriteMemory<unsigned char>(0x91cf00, ShowNonPursuitCops, true);
+	injector::WriteMemory<u8>(0x91cf00, ShowNonPursuitCops, true);
 
 	// Carbon-Style Random Cars (no Vinyls on Random Cars)
 	if (CarbonStyleRandomCars)
 	{
-		injector::WriteMemory<unsigned char>(0x75B229, 0, true);
+		injector::WriteMemory<u8>(0x75B229, 0, true);
 	}
 
 	// Carbon-Style Tire Pop (Better handling with flat tires)
@@ -806,33 +810,36 @@ inline void Init()
 			PoppedTireTractionBoost = 0.4f;
 			injector::WriteMemory(0x6A9EEC, &PoppedTireTractionBoost, true);
 			break;
+
+		default:
+			break;
 	}
 
 	// Time Of Day (Replaces Level of Detail)
 	if (ShowTimeOfDay)
 	{
 		// VOTimeOfDay::Act(char const *,uint)
-		injector::WriteMemory<DWORD>(0x89BB44, 0x50F7A0, true); // change code location
+		injector::WriteMemory<u32>(0x89BB44, 0x50F7A0, true); // change code location
 		injector::MakeRangedNOP(0x50F7AE, 0x50F7B6, true); // cleanup
 
-		unsigned char LoadToEcx[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00 }; // mov ecx,[009B392C]
+		u8 LoadToEcx[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00 }; // mov ecx, [009B392C]
 		injector::WriteMemoryRaw(0x50F7AE, LoadToEcx, sizeof(LoadToEcx), true);
-		injector::WriteMemory<unsigned char>(0x50F7BE, 0x08, true); // mov [ecx+8], edx
+		injector::WriteMemory<u8>(0x50F7BE, 0x08, true); // mov [ecx + 8], edx
 
 
 		// VOTimeOfDay::Draw(void)
-		injector::WriteMemory<DWORD>(0x89BB4C, 0x51B5E0, true);
-		injector::WriteMemory<DWORD>(0x51B5F5, 0x999D1383, true); // "Time of Day"
-		unsigned char LoadToEcx2[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00, 0x90, 0x90, 0x90, 0x8B, 0x49, 0x08 }; // mov ecx,[009B392C]; mov ecx,[ecx+08]
+		injector::WriteMemory<u32>(0x89BB4C, 0x51B5E0, true);
+		injector::WriteMemory<u32>(0x51B5F5, 0x999D1383, true); // "Time of Day"
+		u8 LoadToEcx2[] = { 0x8B, 0x0D, 0x2C, 0x39, 0x9B, 0x00, 0x90, 0x90, 0x90, 0x8B, 0x49, 0x08 }; // mov ecx, [009B392C]; mov ecx, [ecx + 8]
 		injector::WriteMemoryRaw(0x51B617, LoadToEcx2, sizeof(LoadToEcx2), true);
 
 
 		// VOTimeOfDay::SetInitialValues(void)
-		unsigned char LoadTimeOfDay[] = { 0x8B, 0x15, 0x2C, 0x39, 0x9B, 0x00, 0x8B, 0x52, 0x08 }; // mov edx,[009B392C]; mov edx,[edx+08]
+		u8 LoadTimeOfDay[] = { 0x8B, 0x15, 0x2C, 0x39, 0x9B, 0x00, 0x8B, 0x52, 0x08 }; // mov edx, [009B392C]; mov edx, [edx + 8]
 		injector::WriteMemoryRaw(0x50F9E0, LoadTimeOfDay, sizeof(LoadTimeOfDay), true);
 
 		injector::MakeRangedNOP(0x50F9F5, 0x50F9F8, true); // nop fstp
-		injector::WriteMemory<unsigned char>(0x0050F9F4, 0x52, true); // push edx
+		injector::WriteMemory<u8>(0x0050F9F4, 0x52, true); // push edx
 
 		injector::WriteMemory<float>(0x50F9F9, 0.01f, true); // Step Size
 		injector::WriteMemory<float>(0x50F9FE, 0.95f, true); // Max Value
@@ -848,15 +855,15 @@ inline void Init()
 
 		// Make Catch Up Controller always 0
 		injector::MakeRangedNOP(0x7AC203, 0x7AC206, true); // nop setz bl
-		injector::WriteMemory<short>(0x7AC203, 0xDB30, true); // xor bl, bl
-		injector::WriteMemory<unsigned char>(0x7AC245, 0xEB, true);
+		injector::WriteMemory<u16>(0x7AC203, 0xDB30, true); // xor bl, bl
+		injector::WriteMemory<u8>(0x7AC245, 0xEB, true);
 
 		// Freeze it in menu
-		injector::WriteMemory<unsigned char>(0x7ACA68, 0, true); // Circuit
-		injector::WriteMemory<unsigned char>(0x7ACC4B, 0, true); // Sprint
-		injector::WriteMemory<unsigned char>(0x7ACDEE, 0, true); // Drag
-		injector::WriteMemory<unsigned char>(0x7AD022, 0, true); // LAP KO
-		injector::WriteMemory<unsigned char>(0x7AD26B, 0, true); // Speedtrap
+		injector::WriteMemory<u8>(0x7ACA68, 0, true); // Circuit
+		injector::WriteMemory<u8>(0x7ACC4B, 0, true); // Sprint
+		injector::WriteMemory<u8>(0x7ACDEE, 0, true); // Drag
+		injector::WriteMemory<u8>(0x7AD022, 0, true); // LAP KO
+		injector::WriteMemory<u8>(0x7AD26B, 0, true); // Speedtrap
 	}
 
 	// No rev limiter
@@ -867,21 +874,21 @@ inline void Init()
 	}
 
 	// Marker Count
-	injector::WriteMemory<unsigned char>(0x7B3D7D, SelectableMarkerCount, true);
-	injector::WriteMemory<unsigned char>(0x7B3E19, SelectableMarkerCount, true);
-	injector::WriteMemory<unsigned char>(0x7A7A3C, SelectableMarkerCount, true);
-	injector::WriteMemory<unsigned char>(0x7A7ABE, SelectableMarkerCount, true);
+	injector::WriteMemory<u8>(0x7B3D7D, SelectableMarkerCount, true);
+	injector::WriteMemory<u8>(0x7B3E19, SelectableMarkerCount, true);
+	injector::WriteMemory<u8>(0x7A7A3C, SelectableMarkerCount, true);
+	injector::WriteMemory<u8>(0x7A7ABE, SelectableMarkerCount, true);
 
 	// Garage Car Slot Limit
-	injector::WriteMemory<unsigned char>(0x7C1A77, PurchasedCarLimit, true);
+	injector::WriteMemory<u8>(0x7C1A77, PurchasedCarLimit, true);
 
 	// Number of Impound Strikes for New Cars
-	injector::WriteMemory<BYTE>(0x580DA7, ImpoundStrikesCount, true); // FEPlayerCarDB::CreateNewCareerRecord
-	injector::WriteMemory<BYTE>(0x56F758, ImpoundStrikesCount, true); // FECareerRecord::Default (Unused)
-	injector::WriteMemory<BYTE>(0x56F614, ImpoundStrikesCount, true); // FEImpoundData::Default (Unused)
+	injector::WriteMemory<u8>(0x580DA7, ImpoundStrikesCount, true); // FEPlayerCarDB::CreateNewCareerRecord
+	injector::WriteMemory<u8>(0x56F758, ImpoundStrikesCount, true); // FECareerRecord::Default (Unused)
+	injector::WriteMemory<u8>(0x56F614, ImpoundStrikesCount, true); // FEImpoundData::Default (Unused)
 
 	// Number of Maximum Impound Strikes
-	injector::WriteMemory<BYTE>(0x8F4314, MaxImpoundStrikesCount, true); // g_MaximumMaximumTimesBusted
+	injector::WriteMemory<u8>(0x8F4314, MaxImpoundStrikesCount, true); // g_MaximumMaximumTimesBusted
 
 	// Debug Cam Speed
 	injector::WriteMemory<float>(0x8EDEA4, DebugCameraTurboSpeed, true);
@@ -900,17 +907,17 @@ inline void Init()
 	// Allow Longer Save Game Names
 	if (AllowLongerProfileNames)
 	{
-		injector::WriteMemory<unsigned char>(0x527570, 15, true); // UIProfileMenu::ShowKeyboard - Input Limit on Save Game Creation
-		injector::WriteMemory<unsigned char>(0x52758E, 0, true); // UIProfileMenu::ShowKeyboard - Allow every character
-		injector::WriteMemory<unsigned char>(0x563A7A, 16, true); // UIMemcardList::NotificationMessage - Include Longer Names in the Load Save list
-		injector::WriteMemory<unsigned char>(0x563A7E, '/', true); // UIMemcardList::NotificationMessage - Ignore saves with this character
+		injector::WriteMemory<u8>(0x527570, 15, true); // UIProfileMenu::ShowKeyboard - Input Limit on Save Game Creation
+		injector::WriteMemory<u8>(0x52758E, 0, true); // UIProfileMenu::ShowKeyboard - Allow every character
+		injector::WriteMemory<u8>(0x563A7A, 16, true); // UIMemcardList::NotificationMessage - Include Longer Names in the Load Save list
+		injector::WriteMemory<u8>(0x563A7E, '/', true); // UIMemcardList::NotificationMessage - Ignore saves with this character
 	}
 
 	// Car Skin Fix
 	if (CarSkinFix)
 	{
-		injector::WriteMemory<unsigned char>(0x75D2B6, 16, true);
-		// injector::WriteMemory<unsigned char>(0x747F22, 12, true); // CARS\TEXTURES.BIN has 12 dummy skins
+		injector::WriteMemory<u8>(0x75D2B6, 16, true);
+		// injector::WriteMemory<u8>(0x747F22, 12, true); // CARS\TEXTURES.BIN has 12 dummy skins
 
 		injector::MakeJMP(0x747F19, CarSkinFixCodeCave, true);
 		injector::MakeRangedNOP(0x73B324, 0x73B328, true); //crash fix??
@@ -920,9 +927,9 @@ inline void Init()
 	if (ImmobileColFix)
 	{
 		injector::MakeRangedNOP(0x6982C5, 0x6982CB, true);
-		injector::WriteMemory<short>(0x6982C5, 0x00B1, true);
+		injector::WriteMemory<u16>(0x6982C5, 0x00B1, true);
 
-		injector::WriteMemory<unsigned char>(0x69828F, 0, true); // RigidBody::IsImmobile
+		injector::WriteMemory<u8>(0x69828F, 0, true); // RigidBody::IsImmobile
 	}
 
 	// DDay fix for save games with progress
@@ -939,7 +946,7 @@ inline void Init()
 		injector::WriteMemory(0x8F3C94, 0x89F7EC, true); // Replace DiscErrorPC.fng with LS_LangSelect.fng
 		injector::WriteMemory(0x8F3CB0, 0x89F7EC, true); // Replace DiscErrorPC.fng with LS_LangSelect.fng
 		injector::MakeJMP(0x58E9FC, 0x58EAB4, true); // BootFlowManager::BootFlowManager (Force PAL for lang select)
-		injector::WriteMemory<short>(0x64A140, 0x01B0, true); // BuildRegion::ShowLanguageSelect - mov al,1
+		injector::WriteMemory<u16>(0x64A140, 0x01B0, true); // BuildRegion::ShowLanguageSelect - mov al,1
 		injector::MakeCALL(0x5A47F9, LanguageSelectScreen_LanguageSelectScreen, true); // CreateLanguageSelectScreen
 	}
 
@@ -996,6 +1003,5 @@ inline void Init()
 	}
 
 	// Other Things
-	//CreateThread(0, 0, (LPTHREAD_START_ROUTINE)&Thing, NULL, 0, NULL);
 	injector::MakeCALL(0x663EE8, Thing, true); // Hook the hotkey detection to the main loop
 }
