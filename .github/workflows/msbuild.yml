@@ -17,6 +17,13 @@ jobs:
         with:
           submodules: true
 
+      - name: Find solution file dynamically
+        run: |
+          $solution = Get-ChildItem -Recurse -Filter *.sln | Select-Object -First 1
+          $solutionName = [System.IO.Path]::GetFileNameWithoutExtension($solution.Name)
+          echo "SOLUTION_NAME=$solutionName" >> $env:GITHUB_ENV
+        shell: pwsh
+
       - name: Cache vcpkg
         uses: actions/cache@v3
         with:
@@ -36,14 +43,9 @@ jobs:
       - name: Install v142 toolset
         run: |
           choco install visualstudio2017buildtools --params "--add Microsoft.VisualStudio.Component.VC.v142"
-
-      - name: Find solution file dynamically
-        run: |
-          SOLUTION_NAME=$(find . -name "*.sln" -print -quit | xargs basename)
-          echo "SOLUTION_NAME=${SOLUTION_NAME%.sln}" >> $GITHUB_ENV
-          
+      
       - name: Build
-        run: msbuild ${{ env.SOLUTION }} /p:Configuration=Release /p:Platform=x86 /p:PlatformToolset=v142
+        run: msbuild ${{ env.SOLUTION_NAME }} /p:Configuration=Release /p:Platform=x86 /p:PlatformToolset=v142
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
