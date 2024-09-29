@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - 'v*.*.*'  # Triggers on tags 
+      - 'v*.*.*.*'  # Triggers on tags 
 
 jobs:
   build:
